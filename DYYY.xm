@@ -4737,18 +4737,16 @@ static BOOL isGestureActive = NO;
 
 %hook AWECommentMediaDownloadConfigLivePhoto
 
-BOOL commentLivePhotoNotWaterMark = DYYYGetBool(@"DYYYCommentLivePhotoNotWaterMark");
-
 - (BOOL)needClientWaterMark {
-    return commentLivePhotoNotWaterMark ? 0 : %orig;
+    return DYYYGetBool(@"DYYYCommentLivePhotoNotWaterMark") ? NO : %orig;
 }
 
 - (BOOL)needClientEndWaterMark {
-    return commentLivePhotoNotWaterMark ? 0 : %orig;
+    return DYYYGetBool(@"DYYYCommentLivePhotoNotWaterMark") ? NO : %orig;
 }
 
 - (id)watermarkConfig {
-    return commentLivePhotoNotWaterMark ? nil : %orig;
+    return DYYYGetBool(@"DYYYCommentLivePhotoNotWaterMark") ? nil : %orig;
 }
 
 %end
