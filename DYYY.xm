@@ -4196,6 +4196,14 @@ static NSString *const kDYYYLongPressCopyEnabledKey = @"DYYYLongPressCopyTextEna
 
 %hook _TtC33AWECommentLongPressPanelSwiftImpl32CommentLongPressPanelCopyElement
 
+// 41.1.0 的评论长按复制项已迁移为独立 Swift Element；不再依赖旧 SectionViewModel 的数组过滤。
+- (BOOL)elementShouldShow {
+    if (DYYYGetBool(@"DYYYHideCommentLongPressCopy")) {
+        return NO;
+    }
+    return %orig;
+}
+
 - (void)elementTapped {
     if (!DYYYGetBool(@"DYYYCommentCopyText")) {
         %orig;
