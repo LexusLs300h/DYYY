@@ -7,6 +7,7 @@
 
 @interface DYYYFullscreenPlayerState : NSObject
 @property(nonatomic, weak) UIViewController *owner;
+@property(nonatomic, weak) UIWindow *layoutWindow;
 @property(nonatomic, assign) CGSize layoutWindowSize;
 @property(nonatomic, assign) UIEdgeInsets layoutSafeArea;
 @property(nonatomic, assign) CGRect nativeFrame;
@@ -548,7 +549,10 @@
         objc_setAssociatedObject(player, @selector(state:), state, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
     UIWindow *window = player.window;
-    if (window && (!CGSizeEqualToSize(state.layoutWindowSize, window.bounds.size) || !UIEdgeInsetsEqualToEdgeInsets(state.layoutSafeArea, window.safeAreaInsets))) {
+    if (state.layoutWindow != window ||
+        (window && (!CGSizeEqualToSize(state.layoutWindowSize, window.bounds.size) ||
+                    !UIEdgeInsetsEqualToEdgeInsets(state.layoutSafeArea, window.safeAreaInsets)))) {
+        state.layoutWindow = window;
         state.layoutWindowSize = window.bounds.size;
         state.layoutSafeArea = window.safeAreaInsets;
         state.hasNativeFrame = NO;
