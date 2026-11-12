@@ -213,7 +213,12 @@
             imageViewModel.describeString = @"保存当前图片";
         }
 
-        AWEImageAlbumImageModel *currimge = self.awemeModel.albumImages[self.awemeModel.currentImageIndex - 1];
+        AWEImageAlbumImageModel *currimge = nil;
+        if (self.awemeModel.currentImageIndex > 0 && self.awemeModel.currentImageIndex <= self.awemeModel.albumImages.count) {
+            currimge = self.awemeModel.albumImages[self.awemeModel.currentImageIndex - 1];
+        } else {
+            currimge = self.awemeModel.albumImages.firstObject;
+        }
         if (currimge.clipVideo != nil || self.awemeModel.isLivePhoto) {
             if (self.awemeModel.albumImages.count == 1) {
                 imageViewModel.describeString = @"保存实况";
@@ -983,7 +988,12 @@
             imageViewModel.describeString = @"保存当前图片";
         }
 
-        AWEImageAlbumImageModel *currimge = self.awemeModel.albumImages[self.awemeModel.currentImageIndex - 1];
+        AWEImageAlbumImageModel *currimge = nil;
+        if (self.awemeModel.currentImageIndex > 0 && self.awemeModel.currentImageIndex <= self.awemeModel.albumImages.count) {
+            currimge = self.awemeModel.albumImages[self.awemeModel.currentImageIndex - 1];
+        } else {
+            currimge = self.awemeModel.albumImages.firstObject;
+        }
         if (currimge.clipVideo != nil || self.awemeModel.isLivePhoto) {
             if (self.awemeModel.albumImages.count == 1) {
                 imageViewModel.describeString = @"保存实况";
