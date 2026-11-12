@@ -500,14 +500,26 @@ void reloadClearButtonConfiguration(void) {
 }
 
 - (void)saveButtonPosition {
-    if (self.superview) {
-        NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-        CGFloat centerXPercent = self.center.x / self.superview.bounds.size.width;
-        CGFloat centerYPercent = self.center.y / self.superview.bounds.size.height;
-
-        [defaults setFloat:centerXPercent forKey:@"DYYYHideButtonCenterXPercent"];
-        [defaults setFloat:centerYPercent forKey:@"DYYYHideButtonCenterYPercent"];
+    if (!self.superview) {
+        return;
     }
+
+    CGSize containerSize = self.superview.bounds.size;
+    if (!isfinite(containerSize.width) || !isfinite(containerSize.height) ||
+        containerSize.width <= 0.0 || containerSize.height <= 0.0 ||
+        !isfinite(self.center.x) || !isfinite(self.center.y)) {
+        return;
+    }
+
+    CGFloat centerXPercent = self.center.x / containerSize.width;
+    CGFloat centerYPercent = self.center.y / containerSize.height;
+    if (!isfinite(centerXPercent) || !isfinite(centerYPercent)) {
+        return;
+    }
+
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    [defaults setFloat:centerXPercent forKey:@"DYYYHideButtonCenterXPercent"];
+    [defaults setFloat:centerYPercent forKey:@"DYYYHideButtonCenterYPercent"];
 }
 
 - (void)loadSavedPosition {
@@ -515,11 +527,27 @@ void reloadClearButtonConfiguration(void) {
         return;
     }
 
+    CGSize containerSize = self.superview.bounds.size;
+    if (!isfinite(containerSize.width) || !isfinite(containerSize.height) ||
+        containerSize.width <= 0.0 || containerSize.height <= 0.0) {
+        return;
+    }
+
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     CGPoint targetCenter;
     if ([self dyyyHasSavedPosition]) {
-        targetCenter = CGPointMake([defaults floatForKey:@"DYYYHideButtonCenterXPercent"] * self.superview.bounds.size.width,
-                                   [defaults floatForKey:@"DYYYHideButtonCenterYPercent"] * self.superview.bounds.size.height);
+        CGFloat xPercent = [defaults floatForKey:@"DYYYHideButtonCenterXPercent"];
+        CGFloat yPercent = [defaults floatForKey:@"DYYYHideButtonCenterYPercent"];
+        if (isfinite(xPercent) && isfinite(yPercent)) {
+            xPercent = MIN(MAX(xPercent, 0.0), 1.0);
+            yPercent = MIN(MAX(yPercent, 0.0), 1.0);
+            targetCenter = CGPointMake(xPercent * containerSize.width,
+                                       yPercent * containerSize.height);
+        } else {
+            [defaults removeObjectForKey:@"DYYYHideButtonCenterXPercent"];
+            [defaults removeObjectForKey:@"DYYYHideButtonCenterYPercent"];
+            targetCenter = [self dyyyDefaultCenter];
+        }
     } else {
         targetCenter = [self dyyyDefaultCenter];
     }
@@ -896,9 +924,20 @@ void reloadClearButtonConfiguration(void) {
         return NO;
     }
 
-    CGSize size = self.superview.bounds.size;
-    CGFloat halfWidth = CGRectGetWidth(self.bounds) * 0.5;
-    CGFloat halfHeight = CGRectGetHeight(self.bounds) * 0.5;
+    CGRect containerBounds = self.superview.bounds;
+    CGSize size = containerBounds.size;
+    CGFloat buttonWidth = CGRectGetWidth(self.bounds);
+    CGFloat buttonHeight = CGRectGetHeight(self.bounds);
+    if (CGRectIsNull(containerBounds) || CGRectIsInfinite(containerBounds) ||
+        !isfinite(size.width) || !isfinite(size.height) ||
+        !isfinite(buttonWidth) || !isfinite(buttonHeight) ||
+        size.width <= 0.0 || size.height <= 0.0 ||
+        buttonWidth <= 0.0 || buttonHeight <= 0.0) {
+        return NO;
+    }
+
+    CGFloat halfWidth = buttonWidth * 0.5;
+    CGFloat halfHeight = buttonHeight * 0.5;
     *leftX = halfWidth + kDYYYClearButtonEdgeInset;
     *rightX = size.width - halfWidth - kDYYYClearButtonEdgeInset;
     *topY = halfHeight + kDYYYClearButtonEdgeInset;
