@@ -70,6 +70,8 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @end
 
 @interface AWEVideoModel : NSObject
+@property(nonatomic, strong) NSNumber *height;
+@property(nonatomic, strong) NSNumber *width;
 @property(nonatomic, strong) AWEURLModel *playLowBitURL;
 @property(retain, nonatomic) AWEURLModel *playURL;
 @property(copy, nonatomic) NSArray *manualBitrateModels;
