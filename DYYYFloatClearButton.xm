@@ -437,7 +437,12 @@ void reloadClearButtonConfiguration(void) {
         return;
     }
     [self startPeriodicCheck];
-    [self resetFadeTimer];
+    // 窗口切换时保留“清屏后隐藏按钮”的低透明度，不能被淡出定时器重置为正常透明度。
+    if ([self dyyy_isInSelfHiddenState]) {
+        [self dyyy_applySelfHiddenAlpha];
+    } else {
+        [self resetFadeTimer];
+    }
 }
 
 - (void)startPeriodicCheck {
