@@ -4751,6 +4751,27 @@ static BOOL isGestureActive = NO;
 
 %end
 
+// 通用评论媒体配置：覆盖实况以外继承公共水印逻辑的评论动图/图片下载。
+%group DYYYCommentMediaDownloadConfigCommonGroup
+
+%hook DYYYCommentMediaDownloadConfigCommon
+
+- (BOOL)needClientWaterMark {
+    return DYYYGetBool(@"DYYYCommentNotWaterMark") ? NO : %orig;
+}
+
+- (BOOL)needClientEndWaterMark {
+    return DYYYGetBool(@"DYYYCommentNotWaterMark") ? NO : %orig;
+}
+
+- (id)watermarkConfig {
+    return DYYYGetBool(@"DYYYCommentNotWaterMark") ? nil : %orig;
+}
+
+%end
+
+%end
+
 %hook AWECommentImageModel
 - (id)downloadUrl {
     if (DYYYGetBool(@"DYYYCommentNotWaterMark")) {
@@ -12782,6 +12803,15 @@ static void findTargetViewInView(UIView *view) {
     [[NSUserDefaults standardUserDefaults] registerDefaults:@{
         @"DYYYDisableFeedNowPlayingInfo" : @YES
     }];
+
+    // 只在当前抖音版本确实提供这些公共方法时安装，避免旧版本误挂。
+    Class commentMediaConfigClass = objc_getClass("AWECommentMediaDownloadConfigCommon");
+    if (commentMediaConfigClass &&
+        class_getInstanceMethod(commentMediaConfigClass, @selector(needClientWaterMark)) &&
+        class_getInstanceMethod(commentMediaConfigClass, @selector(needClientEndWaterMark)) &&
+        class_getInstanceMethod(commentMediaConfigClass, @selector(watermarkConfig))) {
+        %init(DYYYCommentMediaDownloadConfigCommonGroup, DYYYCommentMediaDownloadConfigCommon = commentMediaConfigClass);
+    }
 
     DYYYMigrateCombinedHDRModeIfNeeded();
 
