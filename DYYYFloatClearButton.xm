@@ -643,17 +643,20 @@ void reloadClearButtonConfiguration(void) {
             self.center = [self dyyyCenterOnEdge:self.dyyyActiveDragEdge forPoint:self.center];
         }
     } else if (gesture.state == UIGestureRecognizerStateChanged) {
-        CGPoint touchPoint = [gesture locationInView:self.superview];
+        // 使用手势增量移动按钮中心，避免把手指触点直接当作中心导致拖动跳位。
+        CGPoint translation = [gesture translationInView:self.superview];
+        CGPoint proposedCenter = CGPointMake(self.center.x + translation.x, self.center.y + translation.y);
+        [gesture setTranslation:CGPointZero inView:self.superview];
         if ([self dyyyStickToEdgeEnabled]) {
-            DYYYClearButtonEdge nearestEdge = [self dyyyNearestEdgeForPoint:touchPoint];
-            CGFloat currentDistance = [self dyyyDistanceFromPoint:touchPoint toEdge:self.dyyyActiveDragEdge];
-            CGFloat nearestDistance = [self dyyyDistanceFromPoint:touchPoint toEdge:nearestEdge];
+            DYYYClearButtonEdge nearestEdge = [self dyyyNearestEdgeForPoint:proposedCenter];
+            CGFloat currentDistance = [self dyyyDistanceFromPoint:proposedCenter toEdge:self.dyyyActiveDragEdge];
+            CGFloat nearestDistance = [self dyyyDistanceFromPoint:proposedCenter toEdge:nearestEdge];
             if (nearestEdge != self.dyyyActiveDragEdge && nearestDistance + 12.0 < currentDistance) {
                 self.dyyyActiveDragEdge = nearestEdge;
             }
-            self.center = [self dyyyCenterOnEdge:self.dyyyActiveDragEdge forPoint:touchPoint];
+            self.center = [self dyyyCenterOnEdge:self.dyyyActiveDragEdge forPoint:proposedCenter];
         } else {
-            self.center = [self dyyyClampedCenterForProposedCenter:touchPoint];
+            self.center = [self dyyyClampedCenterForProposedCenter:proposedCenter];
         }
     }
 
