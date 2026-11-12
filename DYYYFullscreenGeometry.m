@@ -11,7 +11,9 @@
 }
 + (CGRect)aspectFit:(CGSize)media inRect:(CGRect)viewport {
     if (!isfinite(media.width) || !isfinite(media.height) || media.width <= 0 || media.height <= 0 ||
-        CGRectIsEmpty(viewport) || CGRectIsNull(viewport)) return CGRectNull;
+        !isfinite(viewport.origin.x) || !isfinite(viewport.origin.y) ||
+        !isfinite(viewport.size.width) || !isfinite(viewport.size.height) ||
+        CGRectIsEmpty(viewport) || CGRectIsNull(viewport) || CGRectIsInfinite(viewport)) return CGRectNull;
     CGFloat scale = MIN(viewport.size.width / media.width, viewport.size.height / media.height);
     CGSize size = CGSizeMake(media.width * scale, media.height * scale);
     return CGRectMake(CGRectGetMidX(viewport) - size.width / 2, CGRectGetMidY(viewport) - size.height / 2, size.width, size.height);
@@ -25,6 +27,10 @@
                                  CGRectGetMidY(fit) - center.y - (CGRectGetMidY(content) - CGRectGetMidY(bounds)) * scale);
 }
 + (CGRect)unoccludedViewport:(CGRect)viewport top:(CGFloat)top panel:(CGRect)panel gap:(CGFloat)gap {
+    if (CGRectIsNull(viewport) || CGRectIsInfinite(viewport) || CGRectIsEmpty(viewport) ||
+        !isfinite(top) || !isfinite(gap) || gap < 0) return CGRectNull;
+    if (!CGRectIsNull(panel) && (CGRectIsInfinite(panel) || !isfinite(panel.origin.x) || !isfinite(panel.origin.y) ||
+        !isfinite(panel.size.width) || !isfinite(panel.size.height))) return CGRectNull;
     CGFloat bottom = CGRectGetMaxY(viewport);
     top = MAX(top, CGRectGetMinY(viewport));
     if (!CGRectIsNull(panel) && CGRectIntersectsRect(viewport, panel)) bottom = MIN(bottom, CGRectGetMinY(panel) - gap);
