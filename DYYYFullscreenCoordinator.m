@@ -855,7 +855,12 @@
     CGRect available = [DYYYFullscreenGeometry unoccludedViewport:viewport top:top panel:panel gap:0];
     if (CGRectIsNull(available) || view.bounds.size.width <= 0 || view.bounds.size.height <= 0) return native;
     CGRect local = [view.superview convertRect:available fromView:window];
-    return [DYYYFullscreenGeometry aspectFitTransformForBounds:view.bounds contentRect:[self contentRectForImageView:view state:state] center:view.center inRect:local];
+    CGRect content = [self contentRectForImageView:view state:state];
+    // 无有效图片内容或布局尺寸时保留宿主原始 transform，不能把无效计算结果当作 identity 写回。
+    if (CGRectIsNull(content) || CGRectIsInfinite(content) || CGRectIsEmpty(content) ||
+        !isfinite(content.size.width) || !isfinite(content.size.height) || content.size.width <= 0 || content.size.height <= 0 ||
+        CGRectIsNull(local) || CGRectIsInfinite(local) || CGRectIsEmpty(local)) return native;
+    return [DYYYFullscreenGeometry aspectFitTransformForBounds:view.bounds contentRect:content center:view.center inRect:local];
 }
 + (CGAffineTransform)transformForImageView:(UIView *)view proposed:(CGAffineTransform)transform {
     if (![NSThread isMainThread]) return transform;
