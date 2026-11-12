@@ -511,8 +511,9 @@ void reloadClearButtonConfiguration(void) {
         return;
     }
 
-    CGFloat centerXPercent = self.center.x / containerSize.width;
-    CGFloat centerYPercent = self.center.y / containerSize.height;
+    CGRect containerBounds = self.superview.bounds;
+    CGFloat centerXPercent = (self.center.x - CGRectGetMinX(containerBounds)) / containerSize.width;
+    CGFloat centerYPercent = (self.center.y - CGRectGetMinY(containerBounds)) / containerSize.height;
     if (!isfinite(centerXPercent) || !isfinite(centerYPercent)) {
         return;
     }
@@ -541,8 +542,8 @@ void reloadClearButtonConfiguration(void) {
         if (isfinite(xPercent) && isfinite(yPercent)) {
             xPercent = MIN(MAX(xPercent, 0.0), 1.0);
             yPercent = MIN(MAX(yPercent, 0.0), 1.0);
-            targetCenter = CGPointMake(xPercent * containerSize.width,
-                                       yPercent * containerSize.height);
+            targetCenter = CGPointMake(CGRectGetMinX(self.superview.bounds) + xPercent * containerSize.width,
+                                       CGRectGetMinY(self.superview.bounds) + yPercent * containerSize.height);
         } else {
             [defaults removeObjectForKey:@"DYYYHideButtonCenterXPercent"];
             [defaults removeObjectForKey:@"DYYYHideButtonCenterYPercent"];
@@ -690,8 +691,13 @@ void reloadClearButtonConfiguration(void) {
 
     CGFloat indicatorHeight = self.bounds.size.height;
     CGFloat indicatorWidth = 2.0; // 2pt 宽度
-    CGFloat screenWidth = self.superview.bounds.size.width;
+    CGRect containerBounds = self.superview.bounds;
+    CGFloat screenRight = CGRectGetMaxX(containerBounds);
     CGFloat centerY = self.center.y;
+    if (!isfinite(screenRight) || !isfinite(centerY) || !isfinite(indicatorHeight) ||
+        indicatorHeight <= 0.0 || !isfinite(containerBounds.origin.y)) {
+        return;
+    }
 
     if (!self.edgeIndicatorView) {
         self.edgeIndicatorView = [[UIView alloc] init];
@@ -703,7 +709,7 @@ void reloadClearButtonConfiguration(void) {
         self.edgeIndicatorView.userInteractionEnabled = NO;
     }
 
-    self.edgeIndicatorView.frame = CGRectMake(screenWidth - indicatorWidth,
+    self.edgeIndicatorView.frame = CGRectMake(screenRight - indicatorWidth,
                                               centerY - indicatorHeight / 2.0,
                                               indicatorWidth,
                                               indicatorHeight);
@@ -938,14 +944,28 @@ void reloadClearButtonConfiguration(void) {
 
     CGFloat halfWidth = buttonWidth * 0.5;
     CGFloat halfHeight = buttonHeight * 0.5;
-    *leftX = halfWidth + kDYYYClearButtonEdgeInset;
-    *rightX = size.width - halfWidth - kDYYYClearButtonEdgeInset;
-    *topY = halfHeight + kDYYYClearButtonEdgeInset;
-    *bottomY = size.height - halfHeight - kDYYYClearButtonEdgeInset;
-    *minX = halfWidth + kDYYYClearButtonEdgeInset;
-    *maxX = size.width - halfWidth - kDYYYClearButtonEdgeInset;
-    *minY = halfHeight + kDYYYClearButtonEdgeInset;
-    *maxY = size.height - halfHeight - kDYYYClearButtonEdgeInset;
+    CGFloat boundsMinX = CGRectGetMinX(containerBounds);
+    CGFloat boundsMaxX = CGRectGetMaxX(containerBounds);
+    CGFloat boundsMinY = CGRectGetMinY(containerBounds);
+    CGFloat boundsMaxY = CGRectGetMaxY(containerBounds);
+    if (!isfinite(boundsMinX) || !isfinite(boundsMaxX) ||
+        !isfinite(boundsMinY) || !isfinite(boundsMaxY)) {
+        return NO;
+    }
+
+    *minX = boundsMinX + halfWidth + kDYYYClearButtonEdgeInset;
+    *maxX = boundsMaxX - halfWidth - kDYYYClearButtonEdgeInset;
+    *minY = boundsMinY + halfHeight + kDYYYClearButtonEdgeInset;
+    *maxY = boundsMaxY - halfHeight - kDYYYClearButtonEdgeInset;
+
+    // 当父视图小于按钮可用尺寸时，将按钮居中，避免 MIN/MAX 在反向区间内产生越界坐标。
+    if (*minX > *maxX) *minX = *maxX = (boundsMinX + boundsMaxX) * 0.5;
+    if (*minY > *maxY) *minY = *maxY = (boundsMinY + boundsMaxY) * 0.5;
+
+    *leftX = *minX;
+    *rightX = *maxX;
+    *topY = *minY;
+    *bottomY = *maxY;
     return YES;
 }
 
@@ -1038,7 +1058,9 @@ void reloadClearButtonConfiguration(void) {
     if (![self dyyyEdgeMetricsWithLeftX:&leftX rightX:&rightX topY:&topY bottomY:&bottomY minX:&minX maxX:&maxX minY:&minY maxY:&maxY]) {
         return self.center;
     }
-    CGFloat defaultY = MIN(MAX(self.superview.bounds.size.height * (1.0 - kDYYYClearButtonDefaultYFromBottomPercent), minY), maxY);
+    CGFloat defaultY = MIN(MAX(CGRectGetMinY(self.superview.bounds) +
+                               self.superview.bounds.size.height * (1.0 - kDYYYClearButtonDefaultYFromBottomPercent),
+                               minY), maxY);
     return CGPointMake(rightX, defaultY);
 }
 
