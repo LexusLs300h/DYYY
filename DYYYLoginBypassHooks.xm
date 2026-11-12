@@ -109,6 +109,19 @@ static NSURL *DYYYLoginBypassURLByReplacingBundleIdentifier(NSURL *url) {
 
 %end
 
+%group DYYYLoginBypassDetailControllerLifecycle
+
+%hook DYYYLoginBypassDetailController
+
+- (void)didFinishLoginWithUid:(id)userID {
+    %orig(userID);
+    [DYYYLoginBypassManager handleOfficialLoginCompletionWithUserID:userID];
+}
+
+%end
+
+%end
+
 %group DYYYLoginBypassAccountLogout
 
 %hook AWEUserServiceListener
@@ -361,6 +374,12 @@ static NSURL *DYYYLoginBypassURLByReplacingBundleIdentifier(NSURL *url) {
         Class loginListenerClass = objc_getClass("AWEUserServiceListener");
         if (loginListenerClass && class_getInstanceMethod(loginListenerClass, @selector(didFinishLoginWithUid:))) {
             %init(DYYYLoginBypassAccountLifecycle);
+        }
+
+        // 新版抖音通过详情页的 AWEUserMessage 回调通知登录完成。
+        Class detailControllerClass = objc_getClass("AWEAwemeDetailTableViewController");
+        if (detailControllerClass && class_getInstanceMethod(detailControllerClass, @selector(didFinishLoginWithUid:))) {
+            %init(DYYYLoginBypassDetailControllerLifecycle, DYYYLoginBypassDetailController = detailControllerClass);
         }
         if (loginListenerClass && class_getInstanceMethod(loginListenerClass, @selector(didFinishLogoutWithUid:))) {
             %init(DYYYLoginBypassAccountLogout);
