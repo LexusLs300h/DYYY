@@ -2887,72 +2887,60 @@ static void DYYYDisableAVPlayerItemHDRMetadata(AVPlayerItem *item) {
 
 %hook UICollectionView
 
-// 拦截手指拖动
 - (void)handlePan:(UIPanGestureRecognizer *)pan {
-
-    /* 仅处理横屏Feed列表。其余collectionView直接走系统逻辑 */
-    if (self != gFeedCV || !DYYYGetBool(@"DYYYVideoGesture")) {
+    BOOL isLandscapeFeed = NO;
+    UIResponder *responder = self;
+    while ((responder = [responder nextResponder])) {
+        if ([responder isKindOfClass:NSClassFromString(@"AWELandscapeFeedViewController")]) {
+            isLandscapeFeed = YES;
+            break;
+        }
+    }
+    if (!isLandscapeFeed || !DYYYGetBool(@"DYYYVideoGesture")) {
         %orig;
         return;
     }
 
-    /* 取触点坐标、手势状态 */
     CGPoint loc = [pan locationInView:self];
     CGFloat w = self.bounds.size.width;
-    CGFloat xPct = loc.x / w; // 0.0 ~ 1.0
+    CGFloat xPct = loc.x / w;
     UIGestureRecognizerState st = pan.state;
 
-    /* BEGAN：判定左右 20 % 区域 → 进入亮度 / 音量模式 */
     if (st == UIGestureRecognizerStateBegan) {
-
         gStartY = loc.y;
-
-        if (xPct <= 0.20) { // 左边缘 → 亮度
+        if (xPct <= 0.20) {
             gMode = DYEdgeModeBrightness;
             gStartVal = [UIScreen mainScreen].brightness;
-
-        } else if (xPct >= 0.80) { // 右边缘 → 音量
+        } else if (xPct >= 0.80) {
             gMode = DYEdgeModeVolume;
             gStartVal = [[objc_getClass("AVSystemController") sharedAVSystemController] volumeForCategory:@"Audio/Video"];
-
         } else {
-            gMode = DYEdgeModeNone; // 中间区域走原逻辑
+            gMode = DYEdgeModeNone;
         }
     }
 
-    /* 调节阶段：左右边缘时吞掉滚动、修改亮度/音量 */
     if (gMode != DYEdgeModeNone) {
-
         if (st == UIGestureRecognizerStateChanged) {
-
-            CGFloat delta = (gStartY - loc.y) / self.bounds.size.height; // ↑ 为正
-            const CGFloat kScale = 2.0;                                  // 灵敏度
+            CGFloat delta = (gStartY - loc.y) / self.bounds.size.height;
+            const CGFloat kScale = 2.0;
             float newVal = gStartVal + delta * kScale;
-            newVal = fminf(fmaxf(newVal, 0.0), 1.0); // Clamp 0~1
+            newVal = fminf(fmaxf(newVal, 0.0), 1.0);
 
             if (gMode == DYEdgeModeBrightness) {
                 [UIScreen mainScreen].brightness = newVal;
-                // 弹系统亮度 HUD
                 [[%c(SBHUDController) sharedInstance] presentHUDWithIcon:@"Brightness" level:newVal];
-
-            } else { // DYEdgeModeVolume
-                // iOS 18 音量控制 + 系统音量 HUD
+            } else {
                 [[objc_getClass("AVSystemController") sharedAVSystemController] setVolumeTo:newVal forCategory:@"Audio/Video"];
             }
-
-            // 吞掉滚动：归零 translation，防止内容位移
             [pan setTranslation:CGPointZero inView:self];
         }
 
-        /* 结束／取消：状态复位 */
         if (st == UIGestureRecognizerStateEnded || st == UIGestureRecognizerStateCancelled || st == UIGestureRecognizerStateFailed) {
             gMode = DYEdgeModeNone;
         }
-
-        return; // 左右边缘：彻底阻断 %orig，避免翻页
+        return;
     }
 
-    /* 中间区域：直接执行原先翻页逻辑 */
     %orig;
 }
 
@@ -2970,9 +2958,16 @@ static void DYYYDisableAVPlayerItemHDRMetadata(AVPlayerItem *item) {
 %end
 
 %hook AWEPlayInteractionUserAvatarElement
+
+static char kDYYYAvatarElementAlertShowingKey;
+
 - (void)onFollowViewClicked:(UITapGestureRecognizer *)gesture {
     if (DYYYGetBool(@"DYYYFollowTips")) {
-        // 获取用户信息
+        if (objc_getAssociatedObject(self, &kDYYYAvatarElementAlertShowingKey)) {
+            return;
+        }
+        objc_setAssociatedObject(self, &kDYYYAvatarElementAlertShowingKey, @YES, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+
         AWEUserModel *author = nil;
         NSString *nickname = @"";
         NSString *signature = @"";
@@ -2986,17 +2981,12 @@ static void DYYYDisableAVPlayerItemHDRMetadata(AVPlayerItem *item) {
         }
 
         if (author) {
-            // 获取昵称
             if ([author respondsToSelector:@selector(nickname)]) {
                 nickname = [author valueForKey:@"nickname"] ?: @"";
             }
-
-            // 获取签名
             if ([author respondsToSelector:@selector(signature)]) {
                 signature = [author valueForKey:@"signature"] ?: @"";
             }
-
-            // 获取头像URL
             if ([author respondsToSelector:@selector(avatarThumb)]) {
                 AWEURLModel *avatarThumb = [author valueForKey:@"avatarThumb"];
                 if (avatarThumb && avatarThumb.originURLList.count > 0) {
@@ -3017,9 +3007,14 @@ static void DYYYDisableAVPlayerItemHDRMetadata(AVPlayerItem *item) {
                                       avatarURL:avatarURL
                                cancelButtonText:@"取消"
                               confirmButtonText:@"关注"
-                                   cancelAction:nil
-                                    closeAction:nil
+                                   cancelAction:^{
+                                     objc_setAssociatedObject(self, &kDYYYAvatarElementAlertShowingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                                   }
+                                    closeAction:^{
+                                      objc_setAssociatedObject(self, &kDYYYAvatarElementAlertShowingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                                    }
                                   confirmAction:^{
+                                    objc_setAssociatedObject(self, &kDYYYAvatarElementAlertShowingKey, nil, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
                                     %orig(gesture);
                                   }];
     } else {
@@ -3381,18 +3376,13 @@ static void DYYYDisableAVPlayerItemHDRMetadata(AVPlayerItem *item) {
 - (void)layoutSubviews {
     %orig;
     DYYYApplyFloatClearProgressStateToView(self);
+    if (DYYYGetBool(@"DYYYShowScheduleDisplay") && DYYYGetBool(@"DYYYHideVideoProgress")) {
+        self.alpha = 0;
+    }
 }
 
 - (void)setAlpha:(CGFloat)alpha {
-    if (DYYYGetBool(@"DYYYShowScheduleDisplay")) {
-        if (DYYYGetBool(@"DYYYHideVideoProgress")) {
-            %orig(0);
-        } else {
-            %orig(1.0);
-        }
-    } else {
-        %orig;
-    }
+    %orig;
 }
 
 %new
@@ -3803,6 +3793,11 @@ static void DYYYDisableAVPlayerItemHDRMetadata(AVPlayerItem *item) {
 }
 
 - (void)updateProgressSliderWithTime:(CGFloat)arg1 totalDuration:(CGFloat)arg2 {
+    %orig;
+    [self dyyy_syncScheduleLabelsWithCurrentTime:arg1 totalDuration:arg2];
+}
+
+- (void)updatePlayProgressWithTime:(CGFloat)arg1 totalDuration:(CGFloat)arg2 {
     %orig;
     [self dyyy_syncScheduleLabelsWithCurrentTime:arg1 totalDuration:arg2];
 }
