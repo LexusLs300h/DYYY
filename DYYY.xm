@@ -12803,8 +12803,17 @@ static void findTargetViewInView(UIView *view) {
     [DYYYFullscreenCoordinator commentController:self visible:YES];
     [DYYYFloatingButtonCoordinator commentController:self visible:YES];
 }
-- (void)viewDidDisappear:(BOOL)animated {
+- (void)viewDidAppear:(BOOL)animated {
     %orig;
+    // 41.1.0 评论面板使用 Swift 内层控制器；让评论暂停协调器跟随真实面板生命周期。
+    [DYYYCommentPlaybackCoordinator commentController:self visible:YES];
+}
+- (void)viewDidDisappear:(BOOL)animated {
+    BOOL skipsLifecycle = [DYYYCommentPlaybackCoordinator shouldSkipLifecycle:self];
+    %orig;
+    if (!skipsLifecycle) {
+        [DYYYCommentPlaybackCoordinator commentController:self visible:NO];
+    }
     [DYYYFullscreenCoordinator commentController:self visible:NO];
     [DYYYFloatingButtonCoordinator commentController:self visible:NO];
 }
