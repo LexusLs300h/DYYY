@@ -99,27 +99,11 @@ jobs:
           done
 
       - name: Prepare Theos
-        env:
-          THEOS: ${{ github.workspace }}/theos
-          GITHUB_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          brew install ldid xz make
-          echo "THEOS=$THEOS" >> "$GITHUB_ENV"
-
-          if [[ ! -f "$THEOS/makefiles/common.mk" ]]; then
-            rm -rf "$THEOS"
-            git clone --depth 1 --recursive https://github.com/roothide/theos.git "$THEOS"
-          fi
-
-          mkdir -p "$THEOS/sdks"
-          if ! compgen -G "$THEOS/sdks/iPhoneOS*.sdk" > /dev/null; then
-            "$THEOS/bin/install-sdk" latest
-          fi
+        uses: huami1314/theos-action@main
 
       - name: Setup GNU Make
         run: |
-          echo "$(brew --prefix make)/libexec/gnubin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix)/opt/make/libexec/gnubin" >> $GITHUB_PATH
 
       - name: Clean packages dir
         run: rm -rf packages && mkdir -p packages
