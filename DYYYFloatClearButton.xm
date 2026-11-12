@@ -641,7 +641,12 @@ void reloadClearButtonConfiguration(void) {
     if (self.isLocked)
         return;
 
-    [self resetFadeTimer];
+    // 自隐藏按钮仍允许拖动，但拖动过程不能启动会把 alpha 恢复为 0.5 的淡出计时器。
+    if ([self dyyy_isInSelfHiddenState]) {
+        [self dyyy_applySelfHiddenAlpha];
+    } else {
+        [self resetFadeTimer];
+    }
     if (gesture.state == UIGestureRecognizerStateBegan) {
         if ([self dyyyStickToEdgeEnabled]) {
             self.dyyyActiveDragEdge = [self dyyyNearestEdgeForPoint:self.center];
