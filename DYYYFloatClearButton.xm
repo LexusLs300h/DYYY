@@ -925,6 +925,8 @@ void reloadClearButtonConfiguration(void) {
             return fabs(point.y - topY);
         case DYYYClearButtonEdgeBottom:
             return fabs(point.y - bottomY);
+        default:
+            return CGFLOAT_MAX;
     }
 }
 
@@ -957,6 +959,8 @@ void reloadClearButtonConfiguration(void) {
             return CGPointMake(MIN(MAX(point.x, minX), maxX), topY);
         case DYYYClearButtonEdgeBottom:
             return CGPointMake(MIN(MAX(point.x, minX), maxX), bottomY);
+        default:
+            return point;
     }
 }
 
