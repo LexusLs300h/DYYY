@@ -437,12 +437,7 @@ void reloadClearButtonConfiguration(void) {
         return;
     }
     [self startPeriodicCheck];
-    // 窗口切换时保留“清屏后隐藏按钮”的低透明度，不能被淡出定时器重置为正常透明度。
-    if ([self dyyy_isInSelfHiddenState]) {
-        [self dyyy_applySelfHiddenAlpha];
-    } else {
-        [self resetFadeTimer];
-    }
+    [self resetFadeTimer];
 }
 
 - (void)startPeriodicCheck {
@@ -641,12 +636,7 @@ void reloadClearButtonConfiguration(void) {
     if (self.isLocked)
         return;
 
-    // 自隐藏按钮仍允许拖动，但拖动过程不能启动会把 alpha 恢复为 0.5 的淡出计时器。
-    if ([self dyyy_isInSelfHiddenState]) {
-        [self dyyy_applySelfHiddenAlpha];
-    } else {
-        [self resetFadeTimer];
-    }
+    [self resetFadeTimer];
     if (gesture.state == UIGestureRecognizerStateBegan) {
         if ([self dyyyStickToEdgeEnabled]) {
             self.dyyyActiveDragEdge = [self dyyyNearestEdgeForPoint:self.center];
@@ -782,12 +772,7 @@ void reloadClearButtonConfiguration(void) {
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        // 自隐藏状态下允许长按锁定，但不能恢复普通按钮透明度。
-        if ([self dyyy_isInSelfHiddenState]) {
-            [self dyyy_applySelfHiddenAlpha];
-        } else {
-            [self resetFadeTimer];
-        }
+        [self resetFadeTimer];
         self.isLocked = !self.isLocked;
         [self saveLockState];
         NSString *toastMessage = self.isLocked ? @"按钮已锁定" : @"按钮已解锁";
