@@ -782,7 +782,12 @@ void reloadClearButtonConfiguration(void) {
 
 - (void)handleLongPress:(UILongPressGestureRecognizer *)gesture {
     if (gesture.state == UIGestureRecognizerStateBegan) {
-        [self resetFadeTimer];
+        // 自隐藏状态下允许长按锁定，但不能恢复普通按钮透明度。
+        if ([self dyyy_isInSelfHiddenState]) {
+            [self dyyy_applySelfHiddenAlpha];
+        } else {
+            [self resetFadeTimer];
+        }
         self.isLocked = !self.isLocked;
         [self saveLockState];
         NSString *toastMessage = self.isLocked ? @"按钮已锁定" : @"按钮已解锁";
