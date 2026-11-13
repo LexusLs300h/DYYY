@@ -4498,6 +4498,9 @@ static NSArray<NSString *> *dyyy_qualityRank = nil;
         BOOL isDarkMode = [DYYYUtils isDarkMode];
         return isDarkMode ? 1 : 2;
     }
+
+    // 单独启用玻璃或深色时，交由抖音原生 AB 配置决定，避免无返回值。
+    return %orig;
 }
 %end
 
@@ -4516,6 +4519,9 @@ static NSArray<NSString *> *dyyy_qualityRank = nil;
         BOOL isDarkMode = [DYYYUtils isDarkMode];
         return isDarkMode ? 1 : 2;
     }
+
+    // 单独启用玻璃或深色时，交由抖音原生 UI 配置决定，避免无返回值。
+    return %orig;
 }
 %end
 
