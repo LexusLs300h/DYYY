@@ -1,5 +1,4 @@
 #import <Photos/Photos.h>
-#import <QuartzCore/QuartzCore.h>
 #import <UIKit/UIKit.h>
 
 FOUNDATION_EXPORT void DYYYNSLog(NSString *format, ...) NS_FORMAT_FUNCTION(1, 2);
@@ -27,16 +26,8 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
     DYEdgeModeVolume = 2,
 };
 
-@class AWEPlayInteractionContext;
-@class _TtC33AWECommentPanelContainerSwiftImpl31CommentViewControllerStateModel;
-
 @interface UIView (DYYYGlobalAlpha)
 - (void)dyyy_applyGlobalTransparency;
-@end
-
-// 抖音动态主题色
-@interface UIColor (DYYYHostThemeColors)
-+ (UIColor *)awe_colorNamed:(NSString *)name;
 @end
 
 // 音量控制
@@ -70,8 +61,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @end
 
 @interface AWEVideoModel : NSObject
-@property(nonatomic, strong) NSNumber *height;
-@property(nonatomic, strong) NSNumber *width;
 @property(nonatomic, strong) AWEURLModel *playLowBitURL;
 @property(retain, nonatomic) AWEURLModel *playURL;
 @property(copy, nonatomic) NSArray *manualBitrateModels;
@@ -79,8 +68,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @property(copy, nonatomic) NSArray *bitrateRawData;
 @property(nonatomic, strong) URLModel *h264URL;
 @property(nonatomic, strong) URLModel *coverURL;
-@property(nonatomic, assign) BOOL hasFilterHDR;
-@property(nonatomic, assign) NSInteger isSourceHDR;
 @end
 
 @interface AWEMusicModel : NSObject
@@ -115,11 +102,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @property(copy, nonatomic) NSString *shortID;
 @property(copy, nonatomic) NSString *signature;
 @property(copy, nonatomic) AWEURLModel *avatarMedium;
-
-@property(retain, nonatomic) NSString *secUserID;
-@property(retain, nonatomic) NSString *userID;
-- (NSString *)uniqueIDForShow;
-- (NSString *)tiktokDisplayID;
 @end
 
 @interface AWEAnimatedImageVideoInfo : NSObject
@@ -162,8 +144,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @property(nonatomic, strong) NSString *videoFeedTag;
 @property(nonatomic, strong) id shareRecExtra;  // 收藏/喜欢以外的视频专有属性
 @property(nonatomic, copy) NSString *referString; // 推荐页为 homepage_hot
-- (BOOL)dyyy_shouldExcludeFromGlobalHDRFilter;
-- (BOOL)dyyy_containsHDRMetadataInObject:(id)object depth:(NSUInteger)depth;
 @property(nonatomic, strong) NSArray<AWEAwemeTextExtraModel *> *textExtras;
 @property(nonatomic, copy) NSString *itemTitle;
 @property(nonatomic, copy) NSString *descriptionSimpleString;
@@ -177,34 +157,12 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @property(nonatomic, assign) BOOL isShowLandscapeEntryView;
 - (BOOL)isLive;
 - (BOOL)contentFilter;
-- (BOOL)checkIsAd;
-- (BOOL)isHardAdModel;
-- (BOOL)isHardAd;
-- (BOOL)awe_enableHDR;
-- (id)awe_HDRValueFor:(long long)value enableHDR:(BOOL)enableHDR;
 - (AWESearchAwemeExtraModel *)searchExtraModel;
-
-@property(nonatomic, copy) NSString *caption;
-@property(nonatomic, assign) BOOL isFamiliarItem;
 @end
 
 @interface AWEHotListDataController : NSObject
 - (NSNumber *)dyyy_numberValueForLowLikesFilter:(id)rawValue;
 - (NSNumber *)dyyy_resolvedDiggCountForAweme:(AWEAwemeModel *)aweme;
-@end
-
-@interface AWEListDataController : NSObject
-@property(nonatomic, strong) NSMutableArray *dataSource;
-@property(nonatomic, strong) NSMutableArray *filteredDataSource;
-@end
-
-@interface AWEMixVideoListDataController : AWEListDataController
-@end
-
-@interface AWEMixVideoDetailPlayListDataController : AWEListDataController
-@end
-
-@interface AWEMixVideoRelatedListDataController : AWEMixVideoListDataController
 @end
 
 @interface AWEFeedCommentConfigModel : NSObject
@@ -248,12 +206,7 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @end
 
 @interface AWEPlayVideoViewController : UIViewController
-- (CGSize)getPlayerVideoSize;
 @property(nonatomic, strong) AWEAwemeModel *model;
-- (BOOL)enableHDR;
-- (void)setEnableHDR:(BOOL)enableHDR;
-- (BOOL)awe_isCurrentVideoHDR;
-- (void)setPlayerLutFilter:(id)lutFilter HDRLutImage:(id)HDRLutImage;
 @end
 
 @interface AWELongPressPanelViewGroupModel : NSObject
@@ -378,8 +331,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @property(nonatomic, strong) AWEAwemeModel *model;
 @property(nonatomic, strong) NSString *referString;
 @property(nonatomic, assign) BOOL isCommentVCShowing;
-- (id)controllerByProtocol:(Protocol *)protocol;
-- (id)videoDelegate;
 - (void)performCommentAction;
 - (void)performLikeAction;
 - (void)showSharePanel;
@@ -388,9 +339,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 - (void)speedButtonTapped:(id)sender;
 - (void)buttonTouchDown:(id)sender;
 - (void)buttonTouchUp:(id)sender;
-
-@property(nonatomic, weak) id richContentContainer;
-@property(nonatomic, strong) AWEPlayInteractionContext *context;
 @end
 
 @interface HTSLiveRoomStatsMessage : NSObject
@@ -398,8 +346,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @end
 
 @interface AWEFeedVideoButton : UIButton
-
-- (void)setLabelString:(NSString *)labelString;
 @end
 
 @interface AWEMusicCoverButton : UIButton
@@ -491,8 +437,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @end
 
 @interface AWECommentContainerViewController : UIViewController
-
-- (_TtC33AWECommentPanelContainerSwiftImpl31CommentViewControllerStateModel *)state;
 @end
 
 @interface AWECommentInputViewController : UIViewController
@@ -526,10 +470,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @interface AWERLSegmentView : UIView
 @end
 
-// 评论富文本控件。
-@interface YYLabel : UIView
-@end
-
 @interface AWEBaseListViewController : UIViewController
 - (void)applyBlurEffectIfNeeded;
 - (UILabel *)findCommentLabel:(UIView *)view;
@@ -560,11 +500,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 
 @interface AWEStoryContainerCollectionView : UIView
 @end
-
-@interface AWEPlayInteractionCommentPanelController : NSObject
-- (void)performCommentAction;
-@end
-
 
 @interface AWELiveNewPreStreamViewController : UIViewController
 @end
@@ -671,7 +606,7 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 - (AWECommentLongPressPanelContext *)commentPageContext;
 @end
 
-@interface _TtC21AWEIncentiveSwiftImpl29IncentivePendantContainerView : UIView
+@interface _TtC21AWEIncentiveSwiftImpl20PendantContainerView : UIView
 @end
 
 @interface AWECommentLongPressPanelSwiftImpl_CommentLongPressPanelReportElement : NSObject
@@ -782,10 +717,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @end
 
 @interface AWEProfileTaskCardStyleListCollectionViewCell : UIView
-@end
-
-@interface AWEProfileUserDetailComponent : NSObject
-- (void)reportUserDetailVisitIfNeeded:(id)user;
 @end
 
 // AWEVersionUpdateManager相关接口声明
@@ -1096,10 +1027,8 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @interface DUXContentSheet : UIViewController
 - (void)showOnViewController:(id)arg1 completion:(id)arg2;
 - (instancetype)initWithRootViewController:(UIViewController *)controller withTopType:(NSInteger)topType withSheetAligment:(NSInteger)alignment;
-- (instancetype)initWithRootViewController:(UIViewController *)controller withTopType:(NSInteger)topType withHeight:(CGFloat)height;
 - (void)setAutoAlignmentCenter:(BOOL)center;
 - (void)setSheetCornerRadius:(CGFloat)radius;
-@property(nonatomic, strong) UIColor *contentColor;
 @property(retain, nonatomic) UIView *fullScreenView;
 @end
 
@@ -1279,50 +1208,20 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @interface AWEFeedRootViewController : UIViewController
 - (BOOL)prefersStatusBarHidden;
 @end
-@interface AWELiveAudienceContainerController : NSObject
-@property(nonatomic, strong) id roomModel;
-@property(nonatomic, strong) UIViewController *audienceVC;
-- (UIViewController *)audienceViewController;
-@end
-
-@interface AWELiveAudienceViewController : NSObject
-@property(nonatomic, strong) id roomModel;
-@property(nonatomic, strong) UIViewController *audienceViewController;
-@end
-
-@interface IESLiveInnerFeedLiveRoomCell : UICollectionViewCell
-@property(nonatomic, strong) id itemModel;
-@property(nonatomic, strong) id roomAisle;
-@property(nonatomic, strong) UIViewController *audienceVC;
-@end
-
 @interface IESLiveAudienceViewController : UIViewController
-@property(nonatomic, strong) id containerContext;
-@property(nonatomic, strong) id roomDI;
-@property(nonatomic, strong) id roomConfig;
-@property(nonatomic, strong) id roomAisle;
 - (BOOL)prefersStatusBarHidden;
 @end
 @interface AWEAwemeDetailTableViewController : UIViewController
 - (BOOL)prefersStatusBarHidden;
-- (CGFloat)baseTableViewBottomInset;
-- (UIView *)activeBottomBar;
-- (UITableView *)tableView;
-- (NSUInteger)currentVisibleCellIndex;
-- (void)updateTableViewLayoutForTargetPageIndex:(NSInteger)index;
-- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath;
 @end
 @interface AWEAwemeHotSpotTableViewController : UIViewController
 - (BOOL)prefersStatusBarHidden;
 @end
-@interface AWEFullPageFeedNewContainerViewController : UIViewController
+@interface AWEFullPageFeedContainerViewController : UIViewController
 - (BOOL)prefersStatusBarHidden;
 @end
 @interface AFDPureModePageContainerViewController : UIViewController
 - (BOOL)prefersStatusBarHidden;
-- (CGRect)getPureModeContainerFrame;
-@end
-@interface AFDPureModePageListViewController : UIViewController
 @end
 
 @interface AWEFeedUnfollowFamiliarFollowAndDislikeView : UIView
@@ -1330,13 +1229,11 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 
 @interface AWEDPlayerFeedPlayerViewController : UIViewController
 @property(nonatomic) UIView *contentView;
-- (BOOL)enableHDR;
 - (void)setVideoControllerPlaybackRate:(double)arg0;
 @end
 
 @interface AWEDPlayerViewController_Merge : UIViewController
 @property(nonatomic) UIView *contentView;
-- (BOOL)enableHDR;
 - (void)setVideoControllerPlaybackRate:(double)arg0;
 @end
 
@@ -1403,9 +1300,6 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @interface AWENormalModeTabBarController : UIViewController
 @property(nonatomic, strong) AWENormalModeTabBar *awe_tabBar;
 - (void)handleApplicationWillEnterForeground:(NSNotification *)notification;
-// Tab 选中和当前根页面替换（用于悬浮按钮及时刷新）。
-- (void)setSelectedIndex:(NSUInteger)index;
-- (void)p_updateCurrentRootController:(UIViewController *)controller;
 @end
 
 @interface AWELeftSideBarWeatherLabel : UILabel
@@ -1445,43 +1339,15 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 
 @interface AWEPlayInteractionSpeedController : NSObject
 @property(nonatomic, strong) id progressSliderDelegate;
-- (id)playVideoViewController;
 - (CGFloat)longPressFastSpeedValue;
 - (void)changeSpeed:(double)speed;
-- (void)handleLongPressLockedDoubleSpeedChanged:(CGPoint)location gesture:(UIGestureRecognizer *)gesture;
+- (void)handleLongPressLockedDoubleSpeedChanged:(id)arg1 gesture:(UIGestureRecognizer *)gesture;
 - (void)handleLongPressLockedSpeedBegan;
-- (void)handleLongPressLockedDoubleSpeedEnded:(CGPoint)location gesture:(UIGestureRecognizer *)gesture;
-- (void)longPressSpeedControlDidChangeSpeed:(id)speedControl;
-@property(nonatomic, assign) BOOL isLockSpeed;
-@end
-
-@interface AWEPlayInteractionDPlayerSpeedController : NSObject
-- (id)playVideoViewController;
+- (void)handleLongPressLockedDoubleSpeedEnded:(id)arg1 gesture:(UIGestureRecognizer *)gesture;
+- (void)longPressSpeedControlDidChangeSpeed:(double)speed;
 @end
 
 @interface AWEPlayInteractionUserAvatarView : UIView
-@property(retain, nonatomic) UIView *followPromptView;
-@property(retain, nonatomic) UIView *followAnimationView;
-@property(retain, nonatomic) UIView *unfollowAnimationView;
-@property(retain, nonatomic) UIView *staticFollowAnimationView;
-@property(retain, nonatomic) UIView *sendMessageView;
-@property(retain, nonatomic) UIView *sendMessageGuideView;
-@property(nonatomic, weak) UIImageView *avatarSendMessageImageView;
-@property(retain, nonatomic) UIView *enterStoreView;
-@property(retain, nonatomic) UIView *enterStoreGuideView;
-@property(nonatomic, weak) UIImageView *avatarEnterStoreImageView;
-@property(retain, nonatomic) UIView *linkIconContainerView;
-@property(retain, nonatomic) UIImageView *userAvatarLinkIcon;
-- (void)updateRightContainerElement;
-- (void)p_resetFollowAnimation;
-- (void)playFollowAnimation:(id)completion;
-- (void)playUnFollowAnimation;
-- (void)changeSendMessageViewWithFlag:(BOOL)flag;
-@end
-
-@interface AWEPlayInteractionStaticFollowAnimationView : UIView
-@property(retain, nonatomic) UIImageView *plusImageView;
-@property(retain, nonatomic) UIImageView *tickImageView;
 @end
 
 @interface AWELeftSideBarViewController : UIViewController <UICollectionViewDelegate, UICollectionViewDataSource>
@@ -1509,10 +1375,7 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @property(nonatomic) AWEURLModel *playAddr;
 @end
 
-@interface AWENormalModeTabBarPlusButton : UIView
-@end
-
-@interface AWENormalModeTabBarGeneralPlusButton : AWENormalModeTabBarPlusButton
+@interface AWENormalModeTabBarGeneralPlusButton : UIView
 @end
 
 @interface AWEMixVideoPanelMoreView : UIView
@@ -1522,374 +1385,25 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 @property(retain, nonatomic) AWEAwemeModel *model;
 @end
 
-@interface AWEPlayInteractionUserAvatarContext : NSObject
-@property(retain, nonatomic) AWEAwemeModel *model;
-@property(nonatomic, weak) UIView *elementView;
-@property(nonatomic, weak) UIView *avatarPicContainerView;
-@property(nonatomic, weak) UIView *avatarPicView;
-@property(nonatomic, weak) UIView *avatarPicAvatarButton;
-@end
-
 @interface AWEPlayInteractionUserAvatarFollowController : UIViewController
 @property(retain, nonatomic) AWEAwemeModel *model;
 @end
 
-@interface AWEPlayInteractionUserAvatarFollowPromptController : NSObject
-@property(retain, nonatomic) AWEPlayInteractionUserAvatarContext *userAvatarContext;
-@property(retain, nonatomic) UIView *followPromptView;
-@property(retain, nonatomic) UIView *followAddView;
-@property(retain, nonatomic) UIView *followAnimationView;
-@property(retain, nonatomic) UIView *unfollowAnimationView;
-@property(retain, nonatomic) AWEPlayInteractionStaticFollowAnimationView *staticFollowAnimationView;
-- (void)onFollowViewClicked:(id)gesture;
-- (void)onUnFollowViewClicked:(id)arg1;
-- (void)followPromptViewClicked:(id)arg1;
-- (void)layoutElementView;
-- (void)showFollowAddView:(BOOL)show;
-- (BOOL)shouldShowFollowAddWithModel:(id)arg1;
-- (BOOL)shouldShowSpecialFollowWithModel:(id)arg1;
-- (void)viewController_willDisplay;
-- (void)viewController_viewDidAppear;
-- (void)updateFollowStatus;
-- (void)followStatusChanged:(id)arg1;
-- (void)playFollowAnimation;
-- (void)playFollowAnimation:(id)completion;
-- (void)playUnFollowAnimation;
-- (void)_ensureStaticFollowAnimationView;
-@end
-
-@interface AWEPlayInteractionUserAvatarMainBusinessController : NSObject
-@property(retain, nonatomic) AWEPlayInteractionUserAvatarContext *userAvatarContext;
-@property(retain, nonatomic) UIView *avatarPicView;
-- (void)layoutElementView;
-@end
-
-@interface AWEPlayInteractionUserAvatarOptElementElement : NSObject
-@property(retain, nonatomic) AWEPlayInteractionUserAvatarContext *userAvatarContext;
-- (void)layoutElementView;
-- (void)viewController_willDisplay;
-- (void)viewController_viewDidAppear;
-- (void)setAppear:(BOOL)appear;
-@end
-
-@interface AWEPlayInteractionUserAvatarStoryController : NSObject
-@property(nonatomic, weak) UIView *colorRingView;
-- (void)layoutElementView;
-- (void)showStory25RingView;
-@end
-
-@interface AWEPlayInteractionUserAvatarDecorationController : NSObject
-@property(retain, nonatomic) AWEPlayInteractionUserAvatarContext *userAvatarContext;
-@property(retain, nonatomic) UIImageView *decorationView;
-- (void)layoutElementView;
-- (void)viewController_willDisplay;
-- (void)setDecorationStyle:(long long)style;
-@end
-
-@interface AWEPlayInteractionUserAvatarSendMessageController : NSObject
-- (id)userAvatarView;
-- (void)controllerViewDidLayout;
-- (void)controllerStartConfigAvatarView:(id)view;
-- (void)controllerWillDisplay;
-- (void)controllerPlay;
-- (void)controllerReset;
-- (void)updateSendMessageView:(BOOL)show;
-- (void)p_updateSendMessageView:(BOOL)show;
-- (void)p_showSendMessageView:(id)view shouldShowSendMessageView:(BOOL)show animated:(BOOL)animated completion:(id)completion;
-- (BOOL)shouldShowSendMessageView;
-- (BOOL)shouldShowSendMessageGuideAnimation;
-- (void)playSendMessageGuideAnimationIfNeeded;
-- (void)onSendMessageViewClicked:(id)arg1;
-@end
-
-@interface AWEPlayInteractionUserAvatarSendMsgController : NSObject
-@property(retain, nonatomic) AWEPlayInteractionUserAvatarContext *userAvatarContext;
-@property(retain, nonatomic) UIView *sendMessageView;
-@property(retain, nonatomic) UIView *sendMessageGuideView;
-@property(retain, nonatomic) UIImageView *avatarSendMessageImageView;
-- (void)layoutElementView;
-- (void)viewController_willDisplay;
-- (void)viewController_viewDidDisappear;
-- (void)play;
-- (void)reset;
-- (void)changeSendMessageViewWithFlag:(BOOL)flag;
-- (void)showSendMessageView:(id)view show:(BOOL)show animated:(BOOL)animated completion:(id)completion;
-- (void)showSendMessageViewWithAnimation:(BOOL)animated;
-- (BOOL)shouldShowSendMessageView:(id)arg1;
-- (BOOL)shouldShowSendMessageGuideAnimation;
-- (void)updateSendMsgWithFollowShow:(BOOL)show animation:(BOOL)animated;
-- (void)handleAvatarFollowStatusChange:(id)arg1;
-- (void)playSendMessageGuideAnimationIfNeeded;
-- (void)onSendMessageViewClicked:(id)arg1;
-@end
-
-@interface AWEPlayInteractionUserAvatarEnterStoreController : NSObject
-@property(retain, nonatomic) AWEPlayInteractionUserAvatarContext *userAvatarContext;
-@property(retain, nonatomic) UIView *enterStoreView;
-@property(retain, nonatomic) UIView *enterStoreGuideView;
-- (void)layoutElementView;
-- (void)viewController_willDisplay;
-- (void)viewController_viewDidAppear;
-- (void)play;
-- (void)reset;
-- (void)showEnterStore;
-- (void)hideEnterStore;
-- (BOOL)shouldShowEnterStoreView;
-- (BOOL)shouldShowEnterStoreGuideAnimation;
-- (void)playEnterStoreGuideAnimationIfNeeded;
-- (void)handleAvatarFollowStatusChange:(id)arg1;
-- (void)onEnterStoreViewClicked:(id)arg1;
-@end
-
-@interface AWEPlayInteractionUserAvatarAdLinkController : NSObject
-@property(retain, nonatomic) AWEPlayInteractionUserAvatarContext *userAvatarContext;
-@property(retain, nonatomic) UIView *linkIconContainerView;
-@property(retain, nonatomic) UIImageView *userAvatarLinkIcon;
-- (void)layoutElementView;
-- (void)reset;
-- (void)updateCommerceHotSplashLinkIconImageIfNeeded:(id)arg1;
-- (void)onLinkIconContainerViewClicked:(id)arg1;
-@end
-
-// 视频锚点模型，类型 2 为定位锚点。
-@interface AWEAnchorInfoModel : NSObject
-@property(nonatomic, assign) NSUInteger anchorType;
-@end
-
-@interface AWECodeGenCommonAnchorBasicInfoModel : NSObject
-@property(nonatomic, assign) int type;
-@property(nonatomic, copy) NSString *name;
-@end
-
-@interface AWECodeGenCommonAnchorModel : NSObject
-@property(nonatomic, strong) AWECodeGenCommonAnchorBasicInfoModel *basicInfoModel;
+@interface AWECodeGenCommonAnchorBasicInfoModel : UIViewController
+@property(copy, nonatomic) NSString *name;
 @end
 
 @interface AWEFeedTemplateAnchorView : UIView
 @property(retain, nonatomic) AWECodeGenCommonAnchorBasicInfoModel *templateAnchorInfo;
 @end
 
-@interface AWEKnowledgeABTestSettings : NSObject
-+ (BOOL)enableHDRAutomaticIdentification;
-@end
-
-@interface AWEFeedABSettings : NSObject
-+ (BOOL)enableHDRBrightnessOpt;
-+ (BOOL)enableHDRFullModelAdaptation;
-+ (BOOL)hdrAutomaticIdentification;
-@end
-
-@interface BDSimPlayerBizConfig : NSObject
-- (BOOL)enableHDRBrightnessOpt;
-- (BOOL)enableHDRFullModelAdaptation;
-- (BOOL)hdrAutomaticIdentification;
-@end
-
-@interface AWEBDSimPlayerBizConfig : BDSimPlayerBizConfig
-@end
-
-@interface AWEDPlayerVideoDisplayOptState : NSObject
-- (BOOL)enableHDR;
-- (void)setEnableHDR:(BOOL)enableHDR;
-@end
-
-@interface AWEPlayVideoPlayerContext : NSObject
-- (BOOL)enableHDR;
-- (void)setEnableHDR:(BOOL)enableHDR;
-@end
-
-@interface BDSimStreamContext : NSObject
-- (BOOL)enableHDR;
-- (void)setEnableHDR:(BOOL)enableHDR;
-@end
-
-@interface BDSimPlayerHelper : NSObject
-+ (id)hdrValueFor:(long long)value enableHDR:(BOOL)enableHDR;
-@end
-
-@interface BDSimMediaPlayer : NSObject
-- (BOOL)enableHDR;
-- (void)setEnableHDR:(BOOL)enableHDR;
-- (void)setEnablePlayHDRMode;
-- (void)buildHDRConfig:(id)config;
-- (id)awe_HDRValueFor:(long long)value enableHDR:(BOOL)enableHDR;
-@end
-
-@interface TTVideoEngineOwnPlayer : NSObject
-- (BOOL)enableHDR10;
-- (void)setEnableHDR10:(BOOL)enableHDR10;
-@end
-
-@interface IESLiveAudienceHDRController : NSObject
-+ (BOOL)currentHDRStatusForRoomID:(id)roomID;
-+ (BOOL)isCurrentRoomSupportHDR:(id)roomID roomModel:(id)roomModel;
-+ (BOOL)isFeedCanEnableHDRFeature;
-+ (BOOL)isInnerFeedCanEnableHDRFeature;
-+ (BOOL)isUserEnableHDR;
-+ (BOOL)p_isHDRFeatureEnable;
-+ (void)setUserEnableHDR:(BOOL)enableHDR;
-+ (BOOL)shouldShowHDRSwitchForRoom:(id)room;
-@end
-
-@interface BDImageDecoderFactory : NSObject
-+ (BOOL)isHDRImageData:(id)data withHeifDecoderClass:(Class)decoderClass;
-@end
-
-@interface BDImageDecoderImageIO : NSObject
-- (BOOL)isHDRCGImage:(CGImageRef)image decodedToHDR:(BOOL)decodedToHDR;
-- (id)hdrOptionsFor:(id)image decodedToHDR:(BOOL *)decodedToHDR;
-@end
-
-@interface BDImageDecoderHeic : NSObject
-+ (BOOL)isHDRData:(id)data;
-- (BOOL)isHDR;
-- (void)setIsHDR:(BOOL)isHDR;
-@end
-
-@interface BDImageDecoderBVC2 : NSObject
-- (BOOL)isHDR;
-- (void)setIsHDR:(BOOL)isHDR;
-@end
-
-@interface BDImageDecoderWebP : NSObject
-- (BOOL)isHDR;
-- (void)setIsHDR:(BOOL)isHDR;
-@end
-
-@interface BDImage : UIImage
-- (BOOL)isHDR;
-- (void)setIsHDR:(BOOL)isHDR;
-@end
-
-@class HDRMTImageView;
-
-@interface HDRMTUIImageView : UIImageView
-@property(nonatomic, assign) BOOL hdrEnabled;
-@property(nonatomic, strong) HDRMTImageView *innerHDRImageView;
-- (instancetype)initWithFrame:(CGRect)frame hdrEnabled:(BOOL)hdrEnabled;
-@end
-
-@interface HDRMTImageView : UIView
-@property(nonatomic, strong) CAMetalLayer *metalLayer;
-@end
-
-@interface HDRMTButton : UIButton
-@property(nonatomic, strong) HDRMTUIImageView *hdrmtImageView;
-- (void)configHDRContent;
-@end
-
 @interface AWEVideoPlayerConfiguration : NSObject
 + (void)setHDRBrightnessStrategy:(id)strategy;
-+ (double)getHDRBrightnessOffset:(id)configuration brightness:(double)brightness;
++ (double)getHDRBrightnessOffset:(double)offset brightness:(double)brightness;
 @end
 
-@interface AWEFeedABTestServiceObjc : NSObject
-+ (BOOL)enableProfilePreloadHDRBrightnessFilter;
-@end
-
-@interface AWEDPlayerVideoConfig : NSObject
-- (BOOL)enableMetalRenderHDR;
-- (void)setEnableMetalRenderHDR:(BOOL)enableMetalRenderHDR;
-@end
-
-@interface AWEDPlayerVideoController : NSObject
-- (void)configEnableMetalRenderHDRIfNeeded;
-- (void)setEnablePlayHDRModeIfNeeded;
-@end
-
-@interface AWEDPlayerVideoController_Merge : NSObject
-- (void)configEnableMetalRenderHDRIfNeeded;
-- (void)setEnablePlayHDRModeIfNeeded;
-@end
-
-@interface AWEDPlayerPlayControlContainer : NSObject
-- (void)configEnableMetalRenderHDRIfNeeded;
-@end
-
-@interface AWEDPlayerNonSimplayerContainer : NSObject
-- (void)setEnablePlayHDRMode;
-@end
-
-@interface AWEDPlayerSimpleModeContainer : NSObject
-- (void)setEnablePlayHDRModeIfNeeded;
-@end
-
-@interface AWEDPlayerBrightnessContainer : NSObject
-- (BOOL)awe_isCurrentVideoHDR;
-@end
-
-@interface AWEVideoPlayerScreenBrightnessManager : NSObject
-- (BOOL)isHDRVideo;
-- (void)setIsHDRVideo:(BOOL)isHDRVideo;
-@end
-
-@interface ALMOwnPlayerWrapper : NSObject
-- (void)setLutFilter:(id)lutFilter HDRLutImage:(id)HDRLutImage;
-@end
-
-@interface ALMSysPlayerWrapper : NSObject
-- (void)setLutFilter:(id)lutFilter HDRLutImage:(id)HDRLutImage;
-@end
-
-@interface ALMVideoPlayerConfig : NSObject
-+ (void)setPlayerEffectHDRLutImageEnable:(BOOL)enable;
-@end
-
-@interface IESVideoPlayerConfig : NSObject
-+ (void)setPlayerEffectHDRLutImageEnable:(BOOL)enable;
-@end
-
-@interface AWEIMModuleService : NSObject
-- (BOOL)im_forceHDRToSDR;
-@end
-
-@interface IESIMVideoPlayerWrapper : NSObject
-- (void)setupHDREnable:(BOOL)enable;
-@end
-
-@interface AWEIMVideoBrowserCollectionViewCell : UICollectionViewCell
-- (void)setEnablePlayHDR:(BOOL)enable;
-@end
-
-@interface AWEECOMIMAppSettingsService : NSObject
-+ (BOOL)enableVideoPreviewSupportHDR;
-@end
-
-@interface IESLivePlayerController : NSObject
-- (BOOL)isVideoSDR2HDRSupport;
-- (void)setEnableVideoSDR2HDR:(BOOL)enable callTrace:(id)callTrace;
-- (BOOL)enableCloseSDR2HDR;
-@end
-
-@interface AWELivePreStreamPlayer : NSObject
-- (void)changeSDR2HDRWithStrategy;
-@end
-
-@interface HTSLiveStreamPlayer : NSObject
-- (void)setEnableVideoSDR2HDR:(BOOL)enable callTrace:(id)callTrace;
-- (void)changeSDR2HDRWithStrategy;
-@end
-
-@interface IESLiveStreamPlayerVideoAudioEffectPlugin : NSObject
-- (void)setEnableVideoSDR2HDR:(BOOL)enable callTrace:(id)callTrace;
-- (void)changeSDR2HDRWithStrategy;
-@end
-
-@interface TVLManager : NSObject
-- (BOOL)shouldForbidHDR10Render;
-- (void)setShouldForbidHDR10Render:(BOOL)shouldForbid;
-- (void)setupVideoSDR2HDR:(id)config;
-@end
-
-@interface TVLPlayerItemPreferences : NSObject
-- (BOOL)forbidSDR2HDRInPreview;
-- (void)setForbidSDR2HDRInPreview:(BOOL)forbid;
-- (BOOL)enableUseSDR2HDR;
-- (void)setEnableUseSDR2HDR:(BOOL)enable;
-@end
-
-@interface TVLSettingsManager : NSObject
-- (BOOL)enableMetalRenderHDR;
+@interface IESFiltersManager : NSObject
+- (void)setHDRIndensity:(double)intensity;
 @end
 
 @interface AWEFeedPauseVideoRelatedWordView : UIView
@@ -2007,139 +1521,4 @@ typedef NS_ENUM(NSUInteger, DYEdgeMode) {
 
 // 顶栏选中指示线
 @interface AWEFeedMultiTabSelectedContainerView : UIView
-@end
-
-// 新版评论容器的 Logos 映射名，运行时绑定 Swift 完整类名。
-@interface AWECommentPanelContainerSwiftImpl_CommentContainerInnerViewController : UIViewController
-@end
-
-#pragma mark - main 新增功能私有接口
-
-@interface AWEUserService : NSObject
-+ (instancetype)sharedService;
-- (BOOL)isLogin;
-- (NSString *)userID;
-- (AWEUserModel *)currentLoginUser;
-@end
-
-@interface AWEUserServiceListener : NSObject
-- (void)didFinishLoginWithUid:(NSString *)userID;
-- (void)didFinishLogoutWithUid:(NSString *)userID;
-@end
-
-@interface TTAccountMulticast : NSObject
-- (void)broadcastLoginSuccess:(id)user platform:(id)platform reason:(long long)reason;
-@end
-
-@interface AWEPlayInteractionLikeViewSubElement : NSObject
-- (void)updateDiggCount;
-- (AWEAwemeModel *)model;
-- (AWEFeedVideoButton *)likeButton;
-- (AWEFeedVideoButton *)button;
-@end
-
-@interface AWEPlayInteractionDiversionBar : UIView
-@end
-
-@interface AWEPlayInteractionNewDiversionBarBottomElement : NSObject
-@property(nonatomic, strong) AWEPlayInteractionDiversionBar *diversionBarView;
-@end
-
-@interface AWEDouYinSelectUGBottomBarController : NSObject
-- (BOOL)canShowBottomBarForAweme:(id)aweme;
-- (void)updateBottomBarWithAweme:(id)aweme updateTiming:(BOOL)updateTiming;
-- (void)bottomBarAddedToContainer:(id)container;
-@property(nonatomic, strong) UIView *appGuideView;
-@property(nonatomic, strong) UIView *appGuideContainer;
-@end
-
-@interface _TtC33AWECommentPanelContainerSwiftImpl30CommentContainerInnerViewModel : NSObject
-- (instancetype)init;
-- (void)setTabManager:(id)tabManager;
-- (BOOL)isFeedVideoPlaying;
-- (id)feedVideoPlayerController;
-- (void)pauseVideoIfPlayingWithoutShowingPauseIcon;
-- (void)recoverPlayIfPauseByComment;
-@end
-
-@interface AWECommentMediaFeedParams : NSObject
-@property(nonatomic, copy) BOOL (^panelVideoHasPausedByComment)(void);
-@property(nonatomic, copy) BOOL (^fullPanelShouldPreventPlay)(void);
-@end
-
-@interface AWEIMMessageTabNavBarResourceSlotComponent : NSObject
-- (BOOL)canShowInNaviBar;
-@end
-
-@interface AWEIMMessageTabNavBarResourceSlotComponentV2 : NSObject
-- (BOOL)canShowInNaviBar;
-@end
-
-@interface AWEProfileAvatarStoryPublishController : NSObject
-- (BOOL)canShow;
-- (void)updateUIWithContainerView:(UIView *)containerView anchorView:(UIView *)anchorView;
-@end
-
-@interface AWEProfileHeaderGenericOperationComponent : NSObject
-- (id)buildVirtualView:(id)data;
-- (void)updateComponentData:(id)data;
-@end
-
-@interface AFDPlayerAndInteractionService : NSObject
-- (void)statisticsVideoViewedWithID:(NSString *)itemID scene:(NSString *)scene;
-- (void)statisticsVideoViewedWithID:(NSString *)itemID
-                           authorID:(NSString *)authorID
-                       followStatus:(long long)followStatus
-                     followerStatus:(long long)followerStatus
-                            isStory:(BOOL)isStory
-                  isRequestDirectly:(BOOL)isRequestDirectly
-                              scene:(NSString *)scene;
-@end
-
-@interface AWENetworkService : NSObject
-+ (id)postWithURLString:(NSString *)URLString params:(id)params completion:(id)completion;
-+ (id)getWithURLString:(NSString *)URLString params:(id)params completion:(id)completion;
-+ (id)requestWithURLString:(NSString *)URLString params:(id)params method:(id)method completion:(id)completion;
-+ (id)postWithURLString:(NSString *)URLString params:(id)params headerField:(id)headerField completion:(id)completion;
-+ (id)getWithURLString:(NSString *)URLString params:(id)params headerField:(id)headerField completion:(id)completion;
-@end
-
-@interface TTNetworkManager : NSObject
-+ (instancetype)shareInstance;
-- (id)requestForJSONWithURL:(NSString *)url
-                     params:(id)params
-                     method:(NSString *)method
-           needCommonParams:(BOOL)needCommonParams
-                headerField:(id)headerField
-          requestSerializer:(Class)requestSerializerClass
-         responseSerializer:(Class)responseSerializerClass
-                 autoResume:(BOOL)autoResume
-                   callback:(id)callback;
-- (id)requestForJSONWithResponse:(NSString *)url
-                          params:(id)params
-                          method:(NSString *)method
-                needCommonParams:(BOOL)needCommonParams
-                     headerField:(id)headerField
-               requestSerializer:(Class)requestSerializerClass
-              responseSerializer:(Class)responseSerializerClass
-                      autoResume:(BOOL)autoResume
-                        callback:(id)callback;
-- (id)requestForBinaryWithResponse:(NSString *)url
-                            params:(id)params
-                            method:(NSString *)method
-                  needCommonParams:(BOOL)needCommonParams
-                       headerField:(id)headerField
-                          callback:(id)callback;
-@end
-
-@interface IESLiveFlowGuidanceAdView : UIView
-@end
-
-@interface IESLiveFlowGuidanceFragment : NSObject
-+ (BOOL)componentShouldActive:(id)attacher;
-@end
-
-@interface _TtC33AWECommentPanelContainerSwiftImpl31CommentViewControllerStateModel : NSObject
-- (BOOL)isSkipCommentPanelLifecycle;
-- (BOOL)isCommentImageBrowsing;
 @end
