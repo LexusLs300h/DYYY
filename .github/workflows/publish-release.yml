@@ -176,13 +176,11 @@ jobs:
           printf 'Release assets:\n'
           printf '  %s\n' "${deb_files[@]}"
           dylib_files=(packages/*.dylib)
-          if [ "${#dylib_files[@]}" -gt 1 ]; then
-            echo "Expected zero or one optional dylib, found ${#dylib_files[@]}" >&2
+          if [ "${#dylib_files[@]}" -ne 1 ]; then
+            echo "Expected exactly one release dylib, found ${#dylib_files[@]}" >&2
             exit 1
           fi
-          if [ "${#dylib_files[@]}" -eq 1 ]; then
-            printf '  %s\n' "${dylib_files[@]}"
-          fi
+          printf '  %s\n' "${dylib_files[@]}"
 
       - name: Coordinate Release publication
         id: release_gate
@@ -195,11 +193,8 @@ jobs:
           SOURCE_BUILD_BRANCH: ${{ needs.source.outputs.head_branch }}
           SKIP_COOLDOWN: ${{ inputs.skip_cooldown }}
         run: |
-          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$SKIP_COOLDOWN" == "true" ]]; then
-            export RELEASE_MIN_INTERVAL_SECONDS=0
-          else
-            export RELEASE_MIN_INTERVAL_SECONDS=43200
-          fi
+          # Publish every latest successful build; update the versioned Release in place.
+          export RELEASE_MIN_INTERVAL_SECONDS=0
           .github/scripts/release-coordinator.sh
 
       - name: Resolve safe Release target
@@ -259,8 +254,16 @@ jobs:
         run: |
           shopt -s nullglob
           release_assets=(packages/*.deb packages/*.dylib)
-          gh release create "$RELEASE_TAG" "${release_assets[@]}" \
-            --target "$RELEASE_TARGET_SHA" \
-            --title "$RELEASE_TITLE" \
-            --notes-file release-notes.md \
-            --latest
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "${release_assets[@]}" --clobber
+            gh release edit "$RELEASE_TAG" \
+              --title "$RELEASE_TITLE" \
+              --notes-file release-notes.md \
+              --latest
+          else
+            gh release create "$RELEASE_TAG" "${release_assets[@]}" \
+              --target "$RELEASE_TARGET_SHA" \
+              --title "$RELEASE_TITLE" \
+              --notes-file release-notes.md \
+              --latest
+          fi
