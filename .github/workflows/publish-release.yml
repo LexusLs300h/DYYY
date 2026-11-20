@@ -147,7 +147,7 @@ jobs:
             echo "Unable to read package version from ${SOURCE_HEAD_SHA}:control" >&2
             exit 1
           fi
-          release_name="DYYY_${version}#${BUILD_RUN_NUMBER}"
+          release_name="v${version}"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "tag=$release_name" >> "$GITHUB_OUTPUT"
           echo "title=$release_name" >> "$GITHUB_OUTPUT"
@@ -159,27 +159,30 @@ jobs:
           shopt -s nullglob
 
           deb_files=(packages/*.deb)
-          dylib_files=(packages/*.dylib)
           if [ "${#deb_files[@]}" -ne 3 ]; then
-            echo "Expected 3 Deb packages, found ${#deb_files[@]}:" >&2
+            echo "Expected exactly 3 Deb packages, found ${#deb_files[@]}:" >&2
             printf '  %s\n' "${deb_files[@]}" >&2
             exit 1
           fi
-          if [ "${#dylib_files[@]}" -ne 1 ]; then
-            echo "Expected 1 dylib, found ${#dylib_files[@]}:" >&2
-            printf '  %s\n' "${dylib_files[@]}" >&2
-            exit 1
-          fi
 
-          for scheme in rootful rootless roothide; do
-            scheme_files=(packages/*-"${scheme}".deb)
-            if [ "${#scheme_files[@]}" -ne 1 ]; then
-              echo "Expected exactly one ${scheme} package, found ${#scheme_files[@]}" >&2
+          for arch in arm arm64 arm64e; do
+            arch_files=(packages/*_iphoneos-"${arch}".deb)
+            if [ "${#arch_files[@]}" -ne 1 ]; then
+              echo "Expected exactly one ${arch} package, found ${#arch_files[@]}" >&2
               exit 1
             fi
           done
 
-          printf 'Release asset: %s\n' "${deb_files[@]}" "${dylib_files[@]}"
+          printf 'Release assets:\n'
+          printf '  %s\n' "${deb_files[@]}"
+          dylib_files=(packages/*.dylib)
+          if [ "${#dylib_files[@]}" -gt 1 ]; then
+            echo "Expected zero or one optional dylib, found ${#dylib_files[@]}" >&2
+            exit 1
+          fi
+          if [ "${#dylib_files[@]}" -eq 1 ]; then
+            printf '  %s\n' "${dylib_files[@]}"
+          fi
 
       - name: Coordinate Release publication
         id: release_gate
@@ -254,7 +257,9 @@ jobs:
           RELEASE_TITLE: ${{ steps.release.outputs.title }}
           RELEASE_TARGET_SHA: ${{ steps.release_target.outputs.sha }}
         run: |
-          gh release create "$RELEASE_TAG" packages/*.deb packages/*.dylib \
+          shopt -s nullglob
+          release_assets=(packages/*.deb packages/*.dylib)
+          gh release create "$RELEASE_TAG" "${release_assets[@]}" \
             --target "$RELEASE_TARGET_SHA" \
             --title "$RELEASE_TITLE" \
             --notes-file release-notes.md \
